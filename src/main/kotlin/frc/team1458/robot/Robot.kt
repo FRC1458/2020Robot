@@ -6,59 +6,94 @@ import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import frc.team1458.lib.input.Gamepad
+import frc.team1458.lib.pathing.PathGenerator
+import frc.team1458.lib.util.LiveDashboard
 import frc.team1458.lib.util.flow.delay
+import frc.team1458.lib.util.flow.systemTimeSeconds
+import frc.team1458.lib.util.maths.TurtleMaths
 
 class Robot : TimedRobot() {
 
     private val oi: OI = OI()
-    //private val robot = RobotMap() // TODO Might cause issues if not in robotInit
-    //private var drivetrainReversed = false
 
-    val leftMaster = WPI_TalonSRX(2);
-    val rightMaster = WPI_TalonSRX(3);
-    val leftSlave = WPI_TalonSRX(4);
-    val rightSlave = WPI_TalonSRX(1);
+    private val robot: RobotMap = RobotMap()
 
     override fun robotInit() {
         println("Robot Initialized")
+        robot.drivetrain.clearOdom()
+        LiveDashboard.setup(3.0, 14.0)
+    }
 
-        leftMaster.setInverted(true);
-        leftMaster.setSensorPhase(false);
-        leftMaster.setNeutralMode(NeutralMode.Brake);
+    fun log() {
 
-        rightMaster.setInverted(true);
-        rightMaster.setSensorPhase(true);
-        rightMaster.setNeutralMode(NeutralMode.Brake);
+        SmartDashboard.putNumber("Left Distance", robot.drivetrain.leftEnc.distanceFeet)
+        SmartDashboard.putNumber("Right Distance", robot.drivetrain.rightEnc.distanceFeet)
 
-        leftSlave.setInverted(true);
-        leftSlave.follow(leftMaster);
-        leftSlave.setNeutralMode(NeutralMode.Brake);
+        SmartDashboard.putNumber("Left Velocity", robot.drivetrain.leftEnc.velocityFeetSec)
+        SmartDashboard.putNumber("Right Velocity", robot.drivetrain.rightEnc.velocityFeetSec)
 
-        rightSlave.setInverted(true);
-        rightSlave.follow(rightMaster);
-        rightSlave.setNeutralMode(NeutralMode.Brake);
+        SmartDashboard.putNumber("Left Error", robot.drivetrain.leftClosedLoopError)
+        SmartDashboard.putNumber("Right Error", robot.drivetrain.rightClosedLoopError)
 
+        SmartDashboard.putNumber("Odom X Feet", robot.drivetrain.pose.translation.x)
+        SmartDashboard.putNumber("Odom Y Feet", robot.drivetrain.pose.translation.y)
+        SmartDashboard.putNumber("Odom Theta Deg", robot.drivetrain.pose.rotation.degrees)
 
-        leftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
-        rightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10);
+        SmartDashboard.putNumber("NavX Theta", robot.drivetrain.gyro.angle)
+    }
 
-        leftMaster.setSelectedSensorPosition(0);
-        rightMaster.setSelectedSensorPosition(0);
+    fun enabledLog() {
 
-        //leftMaster.sensor
-
-
-        //leftMaster.config_kP(0, 1024 * 0.00103);
-        //leftMaster.config_kF(0, 1024 * 0.924);
-
-        //rightMaster.config_kP(0, 1024 * 0.000967);
-        //rightMaster.config_kF(0, 1024 * 0.962);
+        log()
     }
 
     override fun autonomousInit() {
+
+        val path = robot.lowGearPathGenerator.generatePathQuintic(
+                arrayOf(
+                        PathGenerator.Pose(0.0, 0.0, 0.0),
+                        PathGenerator.Pose(8.0, -6.0, 0.0)
+                ),
+                startVelocity = 0.0, endVelocity = 0.0, reversed = false
+        )
+        PathGenerator.displayOnLiveDashboard(path)
+
+        val controller = RamseteFollower(
+                path = path,
+                odom = robot.drivetrain::pose,
+                zeta = robot.RAMSETE_ZETA,
+                b = robot.RAMSETE_B,
+                goalToleranceFeet = robot.RAMSETE_TOLERANCE_LINEAR,
+                goalToleranceDegrees = robot.RAMSETE_TOLERANCE_ANGULAR)
+
+        while(isEnabled && isAutonomous && !controller.isFinished && false) { // TODO remove false so this thing runs
+            robot.drivetrain.updateOdom()
+
+            val (linvel, angvel) = controller.calculate()
+            robot.drivetrain.driveCmdVel(linvel, angvel)
+
+            enabledLog()
+
+            delay(5)
+        }
+        robot.drivetrain.stop()
     }
 
     override fun autonomousPeriodic() {
+
+        /*
+        val start = systemTimeSeconds
+        while((systemTimeSeconds - start) < 6.0) {
+            val v = 3.0 - Math.abs((systemTimeSeconds - start) - 3)
+            robot.drivetrain.driveVelocity(v, v)
+
+            enabledLog()
+            SmartDashboard.putNumber("Time", (systemTimeSeconds - start));
+            SmartDashboard.putNumber("Setpoint", v);
+        }
+        */
+
 
     }
 
@@ -66,19 +101,25 @@ class Robot : TimedRobot() {
         // do nothing maladors
     }
 
+    // TODO make this faster than 20ms
     override fun teleopPeriodic() {
+        val (left, right) = TurtleMaths.arcadeDrive(TurtleMaths.deadband(oi.throttle.value, 0.05), TurtleMaths.deadband(oi.steer.value, 0.05))
+        //robot.drivetrain.driveVoltageScaled(left, right)
+        robot.drivetrain.driveVelocity(6.0 * left, 6.0 * right)
 
-        val left = 1.0 * (oi.throttle.value - oi.steer.value) * 0.924;
-        val right = 1.0 * (oi.throttle.value + oi.steer.value) * 0.962;
+        robot.drivetrain.updateOdom()
 
-        leftMaster.set(ControlMode.PercentOutput, left);
-        rightMaster.set(ControlMode.PercentOutput, right);
+        // TODO get out of this and put in log function
+        SmartDashboard.putNumber("Speed", oi.throttle.value)
+        SmartDashboard.putNumber("Steer", oi.steer.value)
 
-        SmartDashboard.putNumber("leftmalador", left)
-        SmartDashboard.putNumber("rightmalador", right)
+        SmartDashboard.putNumber("Left Arcade", left * 6.0)
+        SmartDashboard.putNumber("Right Arcade", right * 6.0)
 
-        //SmartDashboard.putNumber("leftError", leftMaster.getClosedLoopError().toDouble())
-        //SmartDashboard.putNumber("rightError", rightMaster.getClosedLoopError().toDouble())
+        SmartDashboard.putNumber("Left Buffer", robot.drivetrain.leftMaster.inst.closedLoopTarget)
+        SmartDashboard.putNumber("Right Buffer", robot.drivetrain.rightMaster.inst.closedLoopTarget)
+
+        enabledLog()
     }
 
     override fun testInit() {
@@ -86,7 +127,9 @@ class Robot : TimedRobot() {
     }
 
     override fun testPeriodic() {
-        // hi maladors
+
+
+        enabledLog()
     }
 
     override fun disabledInit() {
@@ -95,6 +138,7 @@ class Robot : TimedRobot() {
 
     override fun disabledPeriodic() {
 
+        log()
     }
 }
 

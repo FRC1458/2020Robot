@@ -70,7 +70,7 @@ class PID(constants: PIDConstants, target: Double, val deadband: Double = 0.01, 
         }
 
         // Calculate custom feedforward
-        var customFF = constants.kF_func(feedforwardArgs)
+        //var customFF = constants.kF_func(feedforwardArgs)
 
         // Calculate output
         val output =
@@ -78,7 +78,7 @@ class PID(constants: PIDConstants, target: Double, val deadband: Double = 0.01, 
                 + constants.kI * integral
                 + constants.kD * derivativeAverage.average
                 + constants.kF * target
-                + customFF
+                //+ customFF
 
         lastDerivative = derivativeAverage.average
 

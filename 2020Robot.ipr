@@ -19,6 +19,7 @@
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
+  <component name="Encoding" addBOMForNewFiles="with NO BOM" />
   <component name="GradleUISettings">
     <setting name="root" />
   </component>
@@ -54,11 +55,14 @@
       <module fileurl="file://$PROJECT_DIR$/2020Robot.iml" filepath="$PROJECT_DIR$/2020Robot.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11.0.1" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
   <component name="masterDetails">
     <states>

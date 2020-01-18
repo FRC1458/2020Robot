@@ -7,10 +7,14 @@ package frc.team1458.lib.pid
  * @param kI Integral gain
  * @param kD Derivative gain
  * @param kF Feedforward gain
- * @param kF_func Custom feedforward function (allows the feedforward to be calculated from multiple inputs)
+ * @param kS Static friction feedforward
  */
-data class PIDConstants(val kP: Double, val kI: Double = 0.0, val kD: Double = 0.0, val kF: Double = 0.0, val kF_func: (DoubleArray) -> Double = { 0.0 }) {
+data class PIDConstants(val kP: Double, val kI: Double = 0.0, val kD: Double = 0.0, val kF: Double = 0.0, val kS: Double = 0.0) {
+
+    val openLoop: PIDConstants
+        get() = PIDConstants(0.0, 0.0, 0.0, kF, kS)
+
     companion object {
-        val DISABLE = PIDConstants(0.0, 0.0, 0.0, 0.0, { 0.0 })
+        val DISABLE = PIDConstants(0.0, 0.0, 0.0, 0.0, 0.0)
     }
 }

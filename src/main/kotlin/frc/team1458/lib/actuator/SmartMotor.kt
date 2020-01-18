@@ -42,6 +42,31 @@ interface SmartMotor : Motor {
     }
 
     companion object {
+        fun ___talonRotationsToDegrees(talonUnits: Double, ppr: Double): Double {
+            val revolutions = talonUnits / (ppr)
+            val degrees = revolutions * 360.0
+            return degrees
+        }
+
+        fun ___degreesToTalonRotations(degrees: Double, ppr: Double): Double {
+            val revolutions = degrees / 360.0
+            val talonUnits = revolutions * (ppr)
+            return talonUnits
+        }
+
+        fun ___talonVelocityToDegreesPerSecond(talonUnitsPerDecisecond: Double, ppr: Double): Double {
+            val degreesPerDecisecond = ___talonRotationsToDegrees(talonUnitsPerDecisecond, ppr)
+            val degreesPerSecond = degreesPerDecisecond * 10.0
+
+            return degreesPerSecond
+        }
+
+        fun ___degreesPerSecondToTalonVelocity(degreesPerSecond: Double, ppr: Double): Double {
+            val degreesPerDecisecond = degreesPerSecond / 10.0
+            val talonUnitsPerDecisecond = ___degreesToTalonRotations(degreesPerDecisecond, ppr)
+            return talonUnitsPerDecisecond
+        }
+
         fun CANtalonSRX(canID: Int, ticksPerRotation: Double = 1024.0, unitScaling: Boolean = true): SmartMotor {
             val timeoutMs = 20
 

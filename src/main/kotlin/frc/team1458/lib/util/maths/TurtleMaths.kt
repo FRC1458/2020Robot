@@ -63,6 +63,11 @@ object TurtleMaths {
     fun distance(pt1: Pair<Double, Double>, pt2: Pair<Double, Double>): Double {
         return Math.sqrt((pt1.first - pt2.first) * (pt1.first - pt2.first) + (pt1.second - pt2.second) * (pt1.second - pt2.second))
     }
+
+    // Positive speed = forward, positive steer = right
+    fun arcadeDrive(speed: Double, steer: Double) : Pair<Double, Double> {
+        return Pair<Double, Double>(speed + steer, speed - steer)
+    }
 }
 
 fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)!!

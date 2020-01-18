@@ -1,0 +1,75 @@
+package frc.team1458.robot
+
+import frc.team1458.lib.actuator.SRX
+import frc.team1458.lib.actuator.Solenoid
+import frc.team1458.lib.pathing.PathGenerator
+import frc.team1458.lib.pid.PIDConstants
+import frc.team1458.lib.sensor.NavX
+import frc.team1458.lib.sensor.interfaces.AngleSensor
+
+class RobotMap {
+    val leftMaster = SRX(canID = 3, encoderPPR = 18000.0, invert = true, invertEncoder = false)
+    val rightMaster = SRX(canID = 1, encoderPPR = 18000.0, invert = false, invertEncoder = false)
+
+    val drivetrain = Drivetrain(
+            leftMaster = leftMaster, rightMaster = rightMaster,
+            leftMotor  = SRX(canID = 2, master = leftMaster, invert = true),
+            rightMotor = SRX(canID = 4, master = rightMaster, invert = false),
+
+            closedLoop = true,
+            wheelDiameter = 0.51,
+            trackWidth = 2.17,
+
+            // kS is value from characterization tool with / 12.0 added
+            // kF is calculated by this formula
+            // (kV from char. tool) * ((852.5 * pi * wheel_diameter) / ppr)
+            pidConstantsLowGearLeft   = PIDConstants(kP = 0.12, kI = 0.0, kD = 0.0, kF = 0.07117573508, kS = 1.17 / 12.0),
+            pidConstantsLowGearRight  = PIDConstants(kP = 0.12, kI = 0.0, kD = 0.0, kF = 0.06980988942, kS = 1.19 / 12.0),
+
+            pidConstantsHighGearLeft  = PIDConstants.DISABLE,
+            pidConstantsHighGearRight = PIDConstants.DISABLE,
+
+            shifter = null,
+            gyro = NavX.MXP_I2C().yaw,
+            invertGyro = true,
+
+            maxVoltage = 11.0
+    )
+
+    val lowGearPathGenerator = PathGenerator(
+            left_kS = 1.17, right_kS = 1.19,
+            left_kV = 0.938, right_kV = 0.920,
+            left_kA = 0.172, right_kA = 0.187,
+
+            trackWidth = 2.17,
+            maxControlEffortVolts = 10.0,
+            maxVelocity = 7.0,
+            maxAcceleration = 10.0,
+            maxCentripitalAcceleration = 5.0
+    )
+
+    val RAMSETE_B = 2.1
+    val RAMSETE_ZETA = 0.7
+
+    val RAMSETE_TOLERANCE_LINEAR = 0.4
+    val RAMSETE_TOLERANCE_ANGULAR = 25.0
+
+    /**
+     * Track width = 2.17 ft
+     *
+     * LOW GEAR, PRACTICE CHASSIS
+     *
+     * Left:
+     * kS = 1.17 V
+     * kV = 0.938 V / (ft / sec)
+     * kA = 0.172 V / (ft / sec^2)
+     *
+     * Right:
+     * kS = 1.19 V
+     * kV = 0.92 V / (ft / sec)
+     * kA = 0.187 V / (ft / sec^2)
+     *
+     *
+     *
+     */
+}
