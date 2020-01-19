@@ -2,19 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="516d0fd4-cba8-42f3-902a-9bc7aae2e0d6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/actuator/SRX.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RamseteFollower.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RobotMap.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/2020Robot.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/2020Robot.ipr" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/2020Robot.iws" beforeDir="false" afterPath="$PROJECT_DIR$/2020Robot.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/actuator/SmartMotor.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/actuator/SmartMotor.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pid/PID.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pid/PID.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pid/PIDConstants.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pid/PIDConstants.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/util/maths/TurtleMaths.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/util/maths/TurtleMaths.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pathing/PathGenerator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pathing/PathGenerator.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Drivetrain.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Drivetrain.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/OI.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/OI.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RamseteFollower.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RamseteFollower.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Robot.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Robot.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RobotMap.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RobotMap.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -182,10 +175,10 @@
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="186" y="18" key="SettingsEditor" timestamp="1579315030342">
+    <state x="186" y="18" key="SettingsEditor" timestamp="1579373868635">
       <screen x="0" y="0" width="1366" height="764" />
     </state>
-    <state x="186" y="18" key="SettingsEditor/0.0.1366.764@0.0.1366.764" timestamp="1579315030342" />
+    <state x="186" y="18" key="SettingsEditor/0.0.1366.764@0.0.1366.764" timestamp="1579373868635" />
     <state x="362" y="214" key="com.intellij.ide.util.TipDialog" timestamp="1578944834835">
       <screen x="0" y="0" width="1366" height="764" />
     </state>

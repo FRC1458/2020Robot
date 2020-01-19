@@ -6,6 +6,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import frc.team1458.lib.actuator.SRX
+import frc.team1458.lib.actuator.SmartMotor
 import frc.team1458.lib.input.Gamepad
 import frc.team1458.lib.pathing.PathGenerator
 import frc.team1458.lib.util.LiveDashboard
@@ -19,10 +21,17 @@ class Robot : TimedRobot() {
 
     private val robot: RobotMap = RobotMap()
 
+    val quantumIntake = SmartMotor.CANtalonSRX(19)
+
     override fun robotInit() {
         println("Robot Initialized")
         robot.drivetrain.clearOdom()
-        LiveDashboard.setup(3.0, 14.0)
+        LiveDashboard.setup(26.0, 14.0)
+
+        SmartDashboard.putNumber("ramsete_b", robot.RAMSETE_B)
+        SmartDashboard.putNumber("ramsete_zeta", robot.RAMSETE_ZETA)
+
+        SmartDashboard.putNumber("intakevoltage", 8.0)
     }
 
     fun log() {
@@ -49,11 +58,17 @@ class Robot : TimedRobot() {
     }
 
     override fun autonomousInit() {
+        robot.drivetrain.clearOdom()
+
+        LiveDashboard.endPath()
 
         val path = robot.lowGearPathGenerator.generatePathQuintic(
                 arrayOf(
                         PathGenerator.Pose(0.0, 0.0, 0.0),
-                        PathGenerator.Pose(8.0, -6.0, 0.0)
+                        //PathGenerator.Pose(3.5, 2.5, -60.0),
+                        PathGenerator.Pose(7.0, 5.0, 0.0)
+                        // PathGenerator.Pose(6.0, 2.0, 40.0)
+
                 ),
                 startVelocity = 0.0, endVelocity = 0.0, reversed = false
         )
@@ -62,15 +77,19 @@ class Robot : TimedRobot() {
         val controller = RamseteFollower(
                 path = path,
                 odom = robot.drivetrain::pose,
-                zeta = robot.RAMSETE_ZETA,
-                b = robot.RAMSETE_B,
+                zeta = SmartDashboard.getNumber("ramsete_zeta", 2.80),
+                b = SmartDashboard.getNumber("ramsete_b", 0.8),
                 goalToleranceFeet = robot.RAMSETE_TOLERANCE_LINEAR,
                 goalToleranceDegrees = robot.RAMSETE_TOLERANCE_ANGULAR)
 
-        while(isEnabled && isAutonomous && !controller.isFinished && false) { // TODO remove false so this thing runs
+        delay(1000)
+
+        while(isEnabled && isAutonomous && !controller.isFinished) {
             robot.drivetrain.updateOdom()
 
             val (linvel, angvel) = controller.calculate()
+            //break
+
             robot.drivetrain.driveCmdVel(linvel, angvel)
 
             enabledLog()
@@ -94,7 +113,7 @@ class Robot : TimedRobot() {
         }
         */
 
-
+        disabledInit()
     }
 
     override fun teleopInit() {
@@ -108,6 +127,17 @@ class Robot : TimedRobot() {
         robot.drivetrain.driveVelocity(6.0 * left, 6.0 * right)
 
         robot.drivetrain.updateOdom()
+
+
+        if(oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered) {
+            quantumIntake.speed = if (oi.xboxController.getButton(Gamepad.Button.A).triggered) { -0.5 } else { -0.15 }
+        } else if (oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
+            quantumIntake.speed = (0.4)
+        } else {
+            quantumIntake.speed = (0.0)
+        }
+
+        //quantumIntake.setVoltage(SmartDashboard.getNumber("intakevoltage", 0.0) * oi.xboxController.getButton(Gamepad.Button.A).value.toDouble())
 
         // TODO get out of this and put in log function
         SmartDashboard.putNumber("Speed", oi.throttle.value)
@@ -123,13 +153,51 @@ class Robot : TimedRobot() {
     }
 
     override fun testInit() {
+        robot.drivetrain.clearOdom()
 
+        LiveDashboard.endPath()
+
+        val path = robot.lowGearPathGenerator.generatePathQuintic(
+                arrayOf(
+                        PathGenerator.Pose(0.0-7, 0.0-5, 0.0),
+                        //PathGenerator.Pose(3.5-7, 2.5-5, -60.0),
+                        PathGenerator.Pose(7.0-7, 5.0-5, 0.0)
+                ).reversedArray(),
+                startVelocity = 0.0, endVelocity = 0.0, reversed = true
+        )
+        PathGenerator.displayOnLiveDashboard(path)
+
+        val controller = RamseteFollower(
+                path = path,
+                odom = robot.drivetrain::pose,
+                zeta = robot.RAMSETE_ZETA,
+                b = robot.RAMSETE_B,
+                goalToleranceFeet = robot.RAMSETE_TOLERANCE_LINEAR,
+                goalToleranceDegrees = robot.RAMSETE_TOLERANCE_ANGULAR)
+
+        delay(1000)
+
+
+        while(isEnabled && isTest && !controller.isFinished) {
+            robot.drivetrain.updateOdom()
+
+            val (linvel, angvel) = controller.calculate()
+            //break
+
+            robot.drivetrain.driveCmdVel(linvel, angvel)
+
+            enabledLog()
+
+            delay(5)
+        }
+        println("finished DRVIARSELO ${isEnabled} $(isTest} ${controller.isFinished}")
+        robot.drivetrain.stop()
     }
 
     override fun testPeriodic() {
 
 
-        enabledLog()
+        //enabledLog()
     }
 
     override fun disabledInit() {

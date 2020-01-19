@@ -59,7 +59,7 @@ class PathGenerator(
     fun generatePathClampedCubic(initial: Pose, waypoints: Array<Position>, final: Pose, startVelocity: Double = 0.0, endVelocity: Double = 0.0, reversed: Boolean = false): Trajectory {
         trajectoryConfig.setStartVelocity(startVelocity)
         trajectoryConfig.setEndVelocity(endVelocity)
-        trajectoryConfig.setReversed(false)
+        trajectoryConfig.setReversed(reversed)
 
         return TrajectoryGenerator.generateTrajectory(initial.asPose2d, waypoints.map { it.asTranslation2d }, final.asPose2d, trajectoryConfig)
     }
@@ -68,7 +68,7 @@ class PathGenerator(
     fun generatePathQuintic(waypoints: Array<Pose>, startVelocity: Double = 0.0, endVelocity: Double = 0.0, reversed: Boolean = false): Trajectory {
         trajectoryConfig.setStartVelocity(startVelocity)
         trajectoryConfig.setEndVelocity(endVelocity)
-        trajectoryConfig.setReversed(false)
+        trajectoryConfig.setReversed(reversed)
 
         return TrajectoryGenerator.generateTrajectory(waypoints.map { it.asPose2d }, trajectoryConfig)
     }
