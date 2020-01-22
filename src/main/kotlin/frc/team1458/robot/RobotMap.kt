@@ -43,16 +43,16 @@ class RobotMap {
 
             trackWidth = 2.17,
             maxControlEffortVolts = 10.0,
-            maxVelocity = 7.0,
-            maxAcceleration = 10.0,
-            maxCentripitalAcceleration = 5.0
+            maxVelocity = 6.0,
+            maxAcceleration = 4.0,
+            maxCentripitalAcceleration = 2.0
     )
 
-    val RAMSETE_B = 2.1
-    val RAMSETE_ZETA = 0.7
+    val RAMSETE_B = 2.5
+    val RAMSETE_ZETA = 0.8
 
-    val RAMSETE_TOLERANCE_LINEAR = 0.4
-    val RAMSETE_TOLERANCE_ANGULAR = 25.0
+    val RAMSETE_TOLERANCE_LINEAR = 0.35
+    val RAMSETE_TOLERANCE_ANGULAR = 5.0
 
     /**
      * Track width = 2.17 ft

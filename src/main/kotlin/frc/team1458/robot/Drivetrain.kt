@@ -145,7 +145,7 @@ class Drivetrain(val leftMaster: SRX,
 
     // linvel = ft/sec, angvel = rad/sec
     fun driveCmdVel(linvel: Double, angvel: Double) {
-        driveVelocity(linvel + (0.5 * trackWidth * angvel), linvel - (0.5 * trackWidth * angvel))
+        driveVelocity(linvel - (0.5 * trackWidth * angvel), linvel + (0.5 * trackWidth * angvel))
     }
 
     fun stop() {
@@ -166,6 +166,7 @@ class Drivetrain(val leftMaster: SRX,
             leftEnc.zero()
             rightEnc.zero()
         }
+        odom.resetPosition(Pose2d(), Rotation2d.fromDegrees(0.0))
     }
 
 
@@ -181,9 +182,6 @@ class Drivetrain(val leftMaster: SRX,
         LiveDashboard.putPath(pose.translation.x, pose.translation.y, pose.rotation.radians)
     }
 
-    fun resetOdom() {
-        odom.resetPosition(Pose2d(), Rotation2d.fromDegrees(0.0))
-    }
 
     // TODO drive for vision
 
