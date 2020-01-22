@@ -23,8 +23,8 @@ class RobotMap {
             // kS is value from characterization tool with / 12.0 added
             // kF is calculated by this formula
             // (kV from char. tool) * ((852.5 * pi * wheel_diameter) / ppr)
-            pidConstantsLowGearLeft   = PIDConstants(kP = 0.12, kI = 0.0, kD = 0.0, kF = 0.07117573508, kS = 1.17 / 12.0),
-            pidConstantsLowGearRight  = PIDConstants(kP = 0.12, kI = 0.0, kD = 0.0, kF = 0.06980988942, kS = 1.19 / 12.0),
+            pidConstantsLowGearLeft   = PIDConstants(kP = 0.10, kI = 0.0, kD = 0.0, kF = 0.07117573508, kS = 1.17 / 12.0),
+            pidConstantsLowGearRight  = PIDConstants(kP = 0.10, kI = 0.0, kD = 0.0, kF = 0.06980988942, kS = 1.19 / 12.0),
 
             pidConstantsHighGearLeft  = PIDConstants.DISABLE,
             pidConstantsHighGearRight = PIDConstants.DISABLE,

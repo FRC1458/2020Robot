@@ -53,7 +53,7 @@ class Robot : TimedRobot() {
         val path = robot.lowGearPathGenerator.generatePathQuintic(
                 arrayOf(
                         PathGenerator.Pose(0.0, 0.0, 0.0),
-                        PathGenerator.Pose(8.0, -6.0, 0.0)
+                        PathGenerator.Pose(2.0, 2.0, 0.0)
                 ),
                 startVelocity = 0.0, endVelocity = 0.0, reversed = false
         )
