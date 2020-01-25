@@ -66,9 +66,8 @@ class Robot : TimedRobot() {
                 arrayOf(
                         PathGenerator.Pose(0.0, 0.0, 0.0),
                         //PathGenerator.Pose(3.5, 2.5, -60.0),
-                        PathGenerator.Pose(7.0, 5.0, 0.0)
+                        PathGenerator.Pose(2.0, 2.0, 0.0)
                         // PathGenerator.Pose(6.0, 2.0, 40.0)
-
                 ),
                 startVelocity = 0.0, endVelocity = 0.0, reversed = false
         )

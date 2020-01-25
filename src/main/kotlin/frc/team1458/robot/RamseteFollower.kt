@@ -11,8 +11,8 @@ class RamseteFollower(
         val odom: () -> Pose2d,
         val b: Double,
         val zeta: Double,
-        val goalToleranceFeet: Double,
-        val goalToleranceDegrees: Double) {
+        val goalToleranceFeet: Double = 1.0,
+        val goalToleranceDegrees: Double = 10.0) {
 
     val controller = RamseteController(b, zeta)
 
