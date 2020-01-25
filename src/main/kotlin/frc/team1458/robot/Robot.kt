@@ -31,7 +31,7 @@ class Robot : TimedRobot() {
         SmartDashboard.putNumber("ramsete_b", robot.RAMSETE_B)
         SmartDashboard.putNumber("ramsete_zeta", robot.RAMSETE_ZETA)
 
-        SmartDashboard.putNumber("intakevoltage", 8.0)
+        SmartDashboard.putNumber("intakevoltage", 0.8)
     }
 
     fun log() {
@@ -130,9 +130,9 @@ class Robot : TimedRobot() {
 
 
         if(oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered) {
-            quantumIntake.speed = if (oi.xboxController.getButton(Gamepad.Button.A).triggered) { -0.5 } else { -0.15 }
+            quantumIntake.speed = SmartDashboard.getNumber("intakevoltage", 0.0) // if (oi.xboxController.getButton(Gamepad.Button.A).triggered) { intakevoltage } else { -0.15 }
         } else if (oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
-            quantumIntake.speed = (0.4)
+            quantumIntake.speed = -SmartDashboard.getNumber("intakevoltage", 0.0)
         } else {
             quantumIntake.speed = (0.0)
         }

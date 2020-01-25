@@ -3,11 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="516d0fd4-cba8-42f3-902a-9bc7aae2e0d6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/2020Robot.iws" beforeDir="false" afterPath="$PROJECT_DIR$/2020Robot.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pathing/PathGenerator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/lib/pathing/PathGenerator.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Drivetrain.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Drivetrain.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RamseteFollower.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RamseteFollower.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Robot.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/Robot.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RobotMap.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/frc/team1458/robot/RobotMap.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
