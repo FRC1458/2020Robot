@@ -9,16 +9,27 @@ import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.team1458.lib.actuator.SRX
 import frc.team1458.lib.actuator.SmartMotor
 import frc.team1458.lib.actuator.Solenoid
+import frc.team1458.lib.pathing.PathGenerator
 import frc.team1458.lib.pid.PIDConstants
 import frc.team1458.lib.sensor.interfaces.AngleSensor
 import frc.team1458.lib.sensor.interfaces.DistanceSensor
 import frc.team1458.lib.util.LiveDashboard
+import frc.team1458.lib.util.flow.delay
+import kotlin.math.IEEErem
 
 // Notice: this code will be jank - this class should wrap as much of the jank behavior as possible,
 // in order to make the interfaces for other classes easier
+const val RAMSETE_BETA = 2.8
+const val RAMSETE_ZETA = 0.8
+
+const val RAMSETE_TOLERANCE_LINEAR = 0.35
+const val RAMSETE_TOLERANCE_ANGULAR = 2.0
+
 
 class Drivetrain(val leftMaster: SRX,
                  val rightMaster: SRX,
@@ -34,15 +45,24 @@ class Drivetrain(val leftMaster: SRX,
                  var pidConstantsHighGearLeft: PIDConstants,
                  var pidConstantsHighGearRight: PIDConstants,
 
-                 val shifter : Solenoid? = null,
-                 val gyro : AngleSensor,
-                 val invertGyro : Boolean = false,
+                 val shifter: Solenoid? = null,
+                 val gyro: AngleSensor,
+                 val invertGyro: Boolean = false,
 
-                 val maxVoltage : Double = 12.0) {
+                 val maxVoltage: Double = 12.0) {
+
+    init {
+        clearOdom()
+
+        SmartDashboard.putNumber("ramseteBeta", RAMSETE_BETA)
+        SmartDashboard.putNumber("ramseteZeta", RAMSETE_ZETA)
+
+        LiveDashboard.setup(26.0, 14.0)
+    }
 
     val wheelCircumference = wheelDiameter.times(Math.PI)
 
-    val leftEnc : DistanceSensor = object : DistanceSensor {
+    val leftEnc: DistanceSensor = object : DistanceSensor {
         override val distanceMeters: Double
             get() = (leftMaster.encoder.angle * (wheelCircumference ?: 0.0) * 0.3048 / 360.0)
 
@@ -54,7 +74,7 @@ class Drivetrain(val leftMaster: SRX,
         }
     }
 
-    val rightEnc : DistanceSensor = object : DistanceSensor {
+    val rightEnc: DistanceSensor = object : DistanceSensor {
         override val distanceMeters: Double
             get() = (rightMaster.encoder.angle * (wheelCircumference ?: 0.0) * 0.3048 / 360.0)
 
@@ -65,7 +85,6 @@ class Drivetrain(val leftMaster: SRX,
             rightMaster.encoder.zero()
         }
     }
-
 
 
     var highGear = false
@@ -80,10 +99,10 @@ class Drivetrain(val leftMaster: SRX,
         }
 
     val leftClosedLoopError: Double
-        public get() = leftMaster.closedLoopError * (wheelCircumference ?: 0.0) / 360.0
+        get() = leftMaster.closedLoopError * (wheelCircumference ?: 0.0) / 360.0
 
     val rightClosedLoopError: Double
-        public get() = rightMaster.closedLoopError * (wheelCircumference ?: 0.0) / 360.0
+        get() = rightMaster.closedLoopError * (wheelCircumference ?: 0.0) / 360.0
 
     init {
         highGear = false
@@ -92,11 +111,19 @@ class Drivetrain(val leftMaster: SRX,
         configPID()
     }
 
-    fun configPID() {
-        val left = if(highGear) { pidConstantsHighGearLeft } else { pidConstantsLowGearLeft }
-        val right = if(highGear) { pidConstantsHighGearRight } else { pidConstantsLowGearRight }
+    private fun configPID() {
+        val left = if (highGear) {
+            pidConstantsHighGearLeft
+        } else {
+            pidConstantsLowGearLeft
+        }
+        val right = if (highGear) {
+            pidConstantsHighGearRight
+        } else {
+            pidConstantsLowGearRight
+        }
 
-        if(closedLoop) {
+        if (closedLoop) {
             leftMaster.pidConstants = left
             rightMaster.pidConstants = right
         } else {
@@ -149,37 +176,89 @@ class Drivetrain(val leftMaster: SRX,
     }
 
     fun stop() {
-        driveRaw(0.0, 0.0)
+        driveVoltage(0.0, 0.0)
     }
 
-
-    val odom = DifferentialDriveOdometry(Rotation2d.fromDegrees(0.0));
+    private val odom = DifferentialDriveOdometry(Rotation2d.fromDegrees(0.0))
 
     val pose: Pose2d
-        public get() = odom.poseMeters
+        get() = odom.poseMeters
 
     fun clearOdom(clearGyro: Boolean = true, clearEncs: Boolean = true) {
         if (clearGyro) {
             gyro.zero()
         }
+
         if (clearEncs) {
             leftEnc.zero()
             rightEnc.zero()
         }
+
         odom.resetPosition(Pose2d(), Rotation2d.fromDegrees(0.0))
     }
 
-
     // Update odometry - call this at the end of teleopPeriodic
-    fun updateOdom() {
-        fun getHeading() = Math.IEEEremainder(gyro.angle, 360.0) * (if(invertGyro) { -1.0 } else { 1.0 })
-        fun getHeadingRate() = gyro.rate * (if(invertGyro) { -1.0 } else { 1.0 })
+    fun updateOdom(dashboard: Boolean = true) {
+        fun getHeading() = gyro.angle.IEEErem(360.0) * (if (invertGyro) {
+            -1.0
+        } else {
+            1.0
+        })
+
+        fun getHeadingRate() = gyro.rate * (if (invertGyro) {
+            -1.0
+        } else {
+            1.0
+        })
 
         odom.update(Rotation2d.fromDegrees(getHeading()), leftEnc.distanceFeet, rightEnc.distanceFeet)
 
-        // although this says "poseMeters", we are actually using feet for our measurements
-        LiveDashboard.putOdom(pose.translation.x, pose.translation.y, pose.rotation.radians)
-        LiveDashboard.putPath(pose.translation.x, pose.translation.y, pose.rotation.radians)
+        // TODO although this says "poseMeters", we are actually using feet for our measurements
+        if (dashboard) {
+            LiveDashboard.putOdom(pose.translation.x, pose.translation.y, pose.rotation.radians)
+            LiveDashboard.putPath(pose.translation.x, pose.translation.y, pose.rotation.radians)
+        }
+    }
+
+    // TODO Add time limit to this function so we dont auto forever
+    fun followRamsteBlocking(robot: Robot, path: Trajectory, loopEvalLambda: () -> Boolean = { true },
+                             logAndDashboard: Boolean = true, clearOdom: Boolean = true, delayMs: Double = 5.0) {
+        if (clearOdom) {
+            clearOdom()
+        }
+
+        if (logAndDashboard) {
+            LiveDashboard.endPath()
+            PathGenerator.displayOnLiveDashboard(path)
+        }
+
+        // TODO Probably remove/hardcode these
+        val z = SmartDashboard.getNumber("ramseteZeta", RAMSETE_ZETA)
+        val b = SmartDashboard.getNumber("ramseteBeta", RAMSETE_BETA)
+
+        val controller = RamseteFollower(
+                path = path,
+                odom = { pose },
+                zeta = z,
+                b = b,
+                goalToleranceFeet = RAMSETE_TOLERANCE_LINEAR,
+                goalToleranceDegrees = RAMSETE_TOLERANCE_ANGULAR)
+
+        while (robot.isEnabled && !controller.isFinished && loopEvalLambda()) {
+
+            updateOdom()
+            val (linVel, angVel) = controller.calculate()
+
+            driveCmdVel(linVel, angVel)
+
+            if (logAndDashboard) {
+                robot.enabledLog()
+            }
+
+            delay(delayMs)
+        }
+
+        stop()
     }
 
 
@@ -188,6 +267,4 @@ class Drivetrain(val leftMaster: SRX,
     // TODO turn in place
 
     // TODO drive const distance
-
-    // TODO ramsete + odom
 }

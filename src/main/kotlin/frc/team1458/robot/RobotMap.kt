@@ -48,12 +48,6 @@ class RobotMap {
             maxCentripitalAcceleration = 2.0
     )
 
-    val RAMSETE_B = 2.5
-    val RAMSETE_ZETA = 0.8
-
-    val RAMSETE_TOLERANCE_LINEAR = 0.35
-    val RAMSETE_TOLERANCE_ANGULAR = 5.0
-
     /**
      * Track width = 2.17 ft
      *
