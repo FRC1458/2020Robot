@@ -98,7 +98,7 @@ class PathGenerator(
                     while (t < path.totalTimeSeconds) {
                         val s = path.sample(t)
                         logWriter.appendln("${s.timeSeconds},${s.poseMeters.translation.x},${s.poseMeters.translation.y},${s.velocityMetersPerSecond},${s.curvatureRadPerMeter * s.velocityMetersPerSecond},${s.accelerationMetersPerSecondSq}")
-                        t = t + 0.05
+                        t += 0.05
                     }
 
                     logWriter.flush()

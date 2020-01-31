@@ -64,7 +64,7 @@ class Robot : TimedRobot() {
         )
 
         // TODO Test
-        robot.drivetrain.followRamsteBlocking(this, path)
+        robot.drivetrain.followRamseteBlocking(this, path)
     }
 
     override fun autonomousPeriodic() {
