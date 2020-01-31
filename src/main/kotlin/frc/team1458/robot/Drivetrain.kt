@@ -20,6 +20,7 @@ import frc.team1458.lib.sensor.interfaces.AngleSensor
 import frc.team1458.lib.sensor.interfaces.DistanceSensor
 import frc.team1458.lib.util.LiveDashboard
 import frc.team1458.lib.util.flow.delay
+import frc.team1458.lib.util.maths.TurtleMaths
 import kotlin.math.IEEErem
 
 // Notice: this code will be jank - this class should wrap as much of the jank behavior as possible,
@@ -179,22 +180,36 @@ class Drivetrain(val leftMaster: SRX,
         driveVoltage(0.0, 0.0)
     }
 
+    /*
+     * ODOMETRY/PATH FOLLOWING CODE
+     */
+
     private val odom = DifferentialDriveOdometry(Rotation2d.fromDegrees(0.0))
 
     val pose: Pose2d
         get() = odom.poseMeters
+    var odomTrust: Double = 1.0 // TODO Expand (mostly here for safety and total failure mode prevention)
+    // Trust: Value between [0.0, 1.0] with -1.0 representing total failure mode with no recovery
 
     fun clearOdom(clearGyro: Boolean = true, clearEncs: Boolean = true) {
-        if (clearGyro) {
-            gyro.zero()
-        }
+        try {
+            if (clearGyro) {
+                gyro.zero()
+            }
 
-        if (clearEncs) {
-            leftEnc.zero()
-            rightEnc.zero()
-        }
+            if (clearEncs) {
+                leftEnc.zero()
+                rightEnc.zero()
+            }
 
-        odom.resetPosition(Pose2d(), Rotation2d.fromDegrees(0.0))
+            odom.resetPosition(Pose2d(), Rotation2d.fromDegrees(0.0))
+            odomTrust = 1.0
+        } catch (e: Exception) {
+            odomTrust = -1.0
+
+            println("WARNING - clearOdom failed! Most likely disconnected gyro/encoders")
+            // e.printStackTrace()
+        } finally {}
     }
 
     // Update odometry - call this at the end of teleopPeriodic
@@ -211,18 +226,32 @@ class Drivetrain(val leftMaster: SRX,
             1.0
         })
 
-        odom.update(Rotation2d.fromDegrees(getHeading()), leftEnc.distanceFeet, rightEnc.distanceFeet)
+        try {
+            odom.update(Rotation2d.fromDegrees(getHeading()), leftEnc.distanceFeet, rightEnc.distanceFeet)
 
-        // TODO although this says "poseMeters", we are actually using feet for our measurements
-        if (dashboard) {
-            LiveDashboard.putOdom(pose.translation.x, pose.translation.y, pose.rotation.radians)
-            LiveDashboard.putPath(pose.translation.x, pose.translation.y, pose.rotation.radians)
-        }
+            // TODO although this says "poseMeters", we are actually using feet for our measurements
+            if (dashboard) {
+                LiveDashboard.putOdom(pose.translation.x, pose.translation.y, pose.rotation.radians)
+                LiveDashboard.putPath(pose.translation.x, pose.translation.y, pose.rotation.radians)
+            }
+
+            if (odomTrust != -1.0) {
+                odomTrust = TurtleMaths.constrain(max = 1.0, min = 0.0, value = odomTrust + 0.05)
+            }
+        } catch (e: Exception) {
+            if (odomTrust != -1.0) {
+                odomTrust = TurtleMaths.constrain(max = 1.0, min = 0.0, value = odomTrust - 0.20)
+            }
+
+            println("WARNING - updateOdom failed! Most likely disconnected gyro/encoders")
+            // e.printStackTrace()
+        } finally { }
     }
 
     // TODO Add time limit to this function so we dont auto forever
     fun followRamsteBlocking(robot: Robot, path: Trajectory, loopEvalLambda: () -> Boolean = { true },
-                             logAndDashboard: Boolean = true, clearOdom: Boolean = true, delayMs: Double = 5.0) {
+                             logAndDashboard: Boolean = true, clearOdom: Boolean = true, delayMs: Double = 5.0,
+                             odomTrustThreshold: Double = 0.20) {
         if (clearOdom) {
             clearOdom()
         }
@@ -244,8 +273,7 @@ class Drivetrain(val leftMaster: SRX,
                 goalToleranceFeet = RAMSETE_TOLERANCE_LINEAR,
                 goalToleranceDegrees = RAMSETE_TOLERANCE_ANGULAR)
 
-        while (robot.isEnabled && !controller.isFinished && loopEvalLambda()) {
-
+        while (robot.isEnabled && !controller.isFinished && loopEvalLambda() && odomTrust >= odomTrustThreshold) {
             updateOdom()
             val (linVel, angVel) = controller.calculate()
 
@@ -255,10 +283,18 @@ class Drivetrain(val leftMaster: SRX,
                 robot.enabledLog()
             }
 
+            if (odomTrust != 1.0) {
+                println("WARNING - SOME PATH FOLLOWING ODOMETRY UPDATES FAILING ($odomTrust)")
+            }
+
             delay(delayMs)
         }
 
         stop()
+
+        if (odomTrust < odomTrustThreshold) {
+            println("ERROR - PATH FOLLOWING ABORTED: TRUST THRESHOLD EXCEEDED ($odomTrust)")
+        }
     }
 
 
