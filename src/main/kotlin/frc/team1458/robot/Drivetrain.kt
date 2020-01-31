@@ -22,6 +22,7 @@ import frc.team1458.lib.util.LiveDashboard
 import frc.team1458.lib.util.flow.delay
 import frc.team1458.lib.util.maths.TurtleMaths
 import kotlin.math.IEEErem
+import kotlin.math.abs
 
 // Notice: this code will be jank - this class should wrap as much of the jank behavior as possible,
 // in order to make the interfaces for other classes easier
@@ -188,7 +189,9 @@ class Drivetrain(val leftMaster: SRX,
 
     val pose: Pose2d
         get() = odom.poseMeters
-    var odomTrust: Double = 1.0 // TODO Expand (mostly here for safety and total failure mode prevention)
+    var odomTrust: Double // TODO Expand (mostly here for safety and total failure mode prevention)
+        public get() = 1.0
+        public set(value) {}
     // Trust: Value between [0.0, 1.0] with -1.0 representing total failure mode with no recovery
 
     fun clearOdom(clearGyro: Boolean = true, clearEncs: Boolean = true) {
@@ -209,7 +212,8 @@ class Drivetrain(val leftMaster: SRX,
 
             println("WARNING - clearOdom failed! Most likely disconnected gyro/encoders")
             // e.printStackTrace()
-        } finally {}
+        } finally {
+        }
     }
 
     // Update odometry - call this at the end of teleopPeriodic
@@ -245,13 +249,14 @@ class Drivetrain(val leftMaster: SRX,
 
             println("WARNING - updateOdom failed! Most likely disconnected gyro/encoders")
             // e.printStackTrace()
-        } finally { }
+        } finally {
+        }
     }
 
     // TODO Add time limit to this function so we dont auto forever
-    fun followRamsteBlocking(robot: Robot, path: Trajectory, loopEvalLambda: () -> Boolean = { true },
-                             logAndDashboard: Boolean = true, clearOdom: Boolean = true, delayMs: Double = 5.0,
-                             odomTrustThreshold: Double = 0.20) {
+    fun followRamseteBlocking(robot: Robot, path: Trajectory, loopEvalLambda: () -> Boolean = { true },
+                              logAndDashboard: Boolean = true, clearOdom: Boolean = true, delayMs: Double = 5.0,
+                              odomTrustThreshold: Double = 0.20) {
         if (clearOdom) {
             clearOdom()
         }
@@ -298,9 +303,41 @@ class Drivetrain(val leftMaster: SRX,
     }
 
 
-    // TODO drive for vision
+    fun turnInPlaceToAngle(robot: Robot, angleDeltaDegree: Double, maxAngularVelocity: Double = 1.0,
+                           angleToleranceDegree: Double = 5.0) {
+        driveVelocity(0.0, 0.0)
 
-    // TODO turn in place
+        val startRads = pose.rotation.radians
+        val halfRads = (angleDeltaDegree * 0.0174533) / 2.0
+        val highTolerance = (angleDeltaDegree + angleToleranceDegree) * 0.0174533
+        val lowTolerance = (angleDeltaDegree - angleToleranceDegree) * 0.0174533
+
+        var deltaRads = 0.0
+        var velocityScale: Double
+        var newTheta: Double
+        var oldTheta = 0.0
+
+        while (robot.isAutonomous && robot.isEnabled && deltaRads > highTolerance || deltaRads < lowTolerance) {
+            newTheta = pose.rotation.radians
+
+            if (newTheta != oldTheta) {
+                velocityScale = (-1.0 * abs(((1 / halfRads) * deltaRads) - ((deltaRads) * (1 / deltaRads)))) + 1.0
+
+                driveVelocity(maxAngularVelocity * velocityScale, (-1.0 * maxAngularVelocity) * velocityScale)
+
+                deltaRads = pose.rotation.radians - startRads
+                oldTheta = newTheta
+            }
+
+            updateOdom()
+            delay(5) // TODO Maybe try maximum throughput so disable?
+        }
+
+        driveVelocity(0.0, 0.0)
+    }
+
+
+    // TODO drive for vision
 
     // TODO drive const distance
 }
