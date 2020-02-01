@@ -95,7 +95,7 @@ class SRX(val canID: Int,
 
     // Takes degrees/sec
     fun setVelocity(vel: Double) {
-        println("yeeting talon ${SmartMotor.___degreesPerSecondToTalonVelocity(vel, encoderPPR)}, ${pidConstants.kS}, ${Math.copySign(vel, pidConstants.kS)}")
+        //no anish println("yeeting talon ${SmartMotor.___degreesPerSecondToTalonVelocity(vel, encoderPPR)}, ${pidConstants.kS}, ${Math.copySign(vel, pidConstants.kS)}")
         inst.set(ControlMode.Velocity, SmartMotor.___degreesPerSecondToTalonVelocity(vel, encoderPPR), DemandType.ArbitraryFeedForward, Math.copySign(pidConstants.kS, vel))
     }
 

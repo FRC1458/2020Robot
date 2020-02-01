@@ -20,7 +20,10 @@ import frc.team1458.lib.sensor.interfaces.AngleSensor
 import frc.team1458.lib.sensor.interfaces.DistanceSensor
 import frc.team1458.lib.util.LiveDashboard
 import frc.team1458.lib.util.flow.delay
+import frc.team1458.lib.util.flow.systemTimeMillis
+import frc.team1458.lib.util.flow.systemTimeSeconds
 import frc.team1458.lib.util.maths.TurtleMaths
+import java.lang.Math.pow
 import kotlin.math.IEEErem
 import kotlin.math.abs
 
@@ -303,30 +306,58 @@ class Drivetrain(val leftMaster: SRX,
     }
 
 
-    fun turnInPlaceToAngle(robot: Robot, angleDeltaDegree: Double, maxAngularVelocity: Double = 1.0,
+    fun turnInPlaceToAngle(robot: Robot, angleDeltaRadian: Double, maxAngularVelocity: Double = 1.0,
                            angleToleranceDegree: Double = 5.0) {
         driveVelocity(0.0, 0.0)
 
         val startRads = pose.rotation.radians
-        val halfRads = (angleDeltaDegree * 0.0174533) / 2.0
-        val highTolerance = (angleDeltaDegree + angleToleranceDegree) * 0.0174533
-        val lowTolerance = (angleDeltaDegree - angleToleranceDegree) * 0.0174533
+        val halfRads = (angleDeltaRadian * 0.0174533) / 2.0
+        val highTolerance = (angleDeltaRadian + angleToleranceDegree) * 0.0174533
+        val lowTolerance = (angleDeltaRadian - angleToleranceDegree) * 0.0174533
 
         var deltaRads = 0.0
         var velocityScale: Double
         var newTheta: Double
         var oldTheta = 0.0
+        var started = false
+        val starttime = systemTimeSeconds;
+        val angularAcc = 0.1
+        var tOne =maxAngularVelocity/angularAcc
+        val tTwo=((angleDeltaRadian-(pow(maxAngularVelocity,2.0)/angularAcc))/maxAngularVelocity)+tOne
+        val tThree: Double
+        if(tOne>tTwo){
+            tThree=tTwo*2.0
+        }else{
+            tThree=tOne+tTwo
+        }
+        println("ya")
 
-        while (robot.isAutonomous && robot.isEnabled && deltaRads > highTolerance || deltaRads < lowTolerance) {
+        while ((robot.isAutonomous || robot.isTest) && robot.isEnabled && (systemTimeSeconds-starttime<tThree)) {
             newTheta = pose.rotation.radians
 
-            if (newTheta != oldTheta) {
-                velocityScale = (-1.0 * abs(((1 / halfRads) * deltaRads) - ((deltaRads) * (1 / deltaRads)))) + 1.0
 
-                driveVelocity(maxAngularVelocity * velocityScale, (-1.0 * maxAngularVelocity) * velocityScale)
+            if ((newTheta != oldTheta) || (!started)) {
+
+                if(systemTimeSeconds-starttime<tOne&& systemTimeSeconds-starttime<tTwo){
+                    velocityScale=angularAcc*(systemTimeSeconds-starttime)
+                }else if(systemTimeSeconds-starttime>tOne&& systemTimeSeconds-starttime<tTwo){
+                    velocityScale=maxAngularVelocity
+                } else{
+                    if(tOne<tTwo){
+                        velocityScale=maxAngularVelocity-angularAcc*(tTwo-(starttime- systemTimeSeconds))
+                    }else{
+                        velocityScale=angularAcc*tTwo-angularAcc*(tTwo-(starttime- systemTimeSeconds))
+                    }
+                }
+
+
+                driveCmdVel(0.0,velocityScale)
+                println("left: "+maxAngularVelocity*velocityScale)
+                println("right: "+(-1*maxAngularVelocity*velocityScale))
 
                 deltaRads = pose.rotation.radians - startRads
                 oldTheta = newTheta
+                started = true
             }
 
             updateOdom()
