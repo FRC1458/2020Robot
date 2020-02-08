@@ -45,6 +45,12 @@ class Drivetrain(val leftMaster: SRX,
                  wheelDiameter: Double,
                  val trackWidth: Double,
 
+                 var starttime:Double,
+                 var tOne:Double,
+                 var tTwo:Double,
+                 var tThree:Double,
+                 val angularAcc:Double = 0.1,
+
                  var pidConstantsLowGearLeft: PIDConstants,
                  var pidConstantsLowGearRight: PIDConstants,
                  var pidConstantsHighGearLeft: PIDConstants,
@@ -307,36 +313,33 @@ class Drivetrain(val leftMaster: SRX,
 
 
     fun turnInPlaceToAngle(robot: Robot, angleDeltaRadian: Double, maxAngularVelocity: Double = 1.0,
-                           angleToleranceDegree: Double = 5.0) {
-        driveVelocity(0.0, 0.0)
+                           angleToleranceDegree: Double = 5.0, start:Boolean=false ){
+        if(start) {
 
-        val startRads = pose.rotation.radians
-        val halfRads = (angleDeltaRadian * 0.0174533) / 2.0
-        val highTolerance = (angleDeltaRadian + angleToleranceDegree) * 0.0174533
-        val lowTolerance = (angleDeltaRadian - angleToleranceDegree) * 0.0174533
+            driveVelocity(0.0, 0.0)
 
-        var deltaRads = 0.0
-        var velocityScale: Double
-        var newTheta: Double
-        var oldTheta = 0.0
-        var started = false
-        val starttime = systemTimeSeconds;
-        val angularAcc = 0.1
-        var tOne =maxAngularVelocity/angularAcc
-        val tTwo=((angleDeltaRadian-(pow(maxAngularVelocity,2.0)/angularAcc))/maxAngularVelocity)+tOne
-        val tThree: Double
-        if(tOne>tTwo){
-            tThree=tTwo*2.0
-        }else{
-            tThree=tOne+tTwo
+            val startRads = pose.rotation.radians
+            val halfRads = (angleDeltaRadian * 0.0174533) / 2.0
+            val highTolerance = (angleDeltaRadian + angleToleranceDegree) * 0.0174533
+            val lowTolerance = (angleDeltaRadian - angleToleranceDegree) * 0.0174533
+
+            var deltaRads = 0.0
+
+            var newTheta: Double
+            var oldTheta = 0.0
+            var started = false
+            val starttime = systemTimeSeconds;
+            tOne = maxAngularVelocity / angularAcc
+            tTwo = ((angleDeltaRadian - (pow(maxAngularVelocity, 2.0) / angularAcc)) / maxAngularVelocity) + tOne
+            if (tOne > tTwo) {
+                tThree = tTwo * 2.0
+            } else {
+                tThree = tOne + tTwo
+            }
+            println("ya")
         }
-        println("ya")
-
-        while ((robot.isAutonomous || robot.isTest) && robot.isEnabled && (systemTimeSeconds-starttime<tThree)) {
-            newTheta = pose.rotation.radians
-
-
-            if ((newTheta != oldTheta) || (!started)) {
+        var velocityScale: Double
+            if (systemTimeSeconds-starttime<tThree) {
 
                 if(systemTimeSeconds-starttime<tOne&& systemTimeSeconds-starttime<tTwo){
                     velocityScale=angularAcc*(systemTimeSeconds-starttime)
@@ -355,16 +358,12 @@ class Drivetrain(val leftMaster: SRX,
                 println("left: "+maxAngularVelocity*velocityScale)
                 println("right: "+(-1*maxAngularVelocity*velocityScale))
 
-                deltaRads = pose.rotation.radians - startRads
-                oldTheta = newTheta
-                started = true
             }
 
             updateOdom()
-            delay(5) // TODO Maybe try maximum throughput so disable?
-        }
+             // TODO Maybe try maximum throughput so disable?
 
-        driveVelocity(0.0, 0.0)
+
     }
 
 
