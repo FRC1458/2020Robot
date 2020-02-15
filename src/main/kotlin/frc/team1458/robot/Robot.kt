@@ -116,7 +116,9 @@ class Robot : TimedRobot() {
         //Color sensing
         //FASTTTTTTTT
 
-        println(robot.colorSense.update())
+        val color = robot.colorSense.update()
+        println(color)
+        SmartDashboard.putString("Color Detected",color)
 
 
 
