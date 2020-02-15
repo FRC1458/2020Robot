@@ -124,7 +124,16 @@ class Robot : TimedRobot() {
     }
 
     override fun testInit() {
-        robot.drivetrain.turnInPlaceToAngle(this,180.0,1.0,5.0)
+        //robot.drivetrain.turnInPlaceToAngle(this,180.0,1.0,5.0)
+        robot.drivetrain.leftMotor.setRaw(0.3)
+        delay(1500)
+        robot.drivetrain.leftMotor.setRaw(0.0)
+
+        delay(1500)
+
+        robot.drivetrain.rightMotor.setRaw(0.3)
+        delay(1500)
+        robot.drivetrain.rightMotor.setRaw(0.0)
     }
 
     override fun testPeriodic() {
