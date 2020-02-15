@@ -6,8 +6,12 @@ import frc.team1458.lib.pathing.PathGenerator
 import frc.team1458.lib.pid.PIDConstants
 import frc.team1458.lib.sensor.NavX
 import frc.team1458.lib.sensor.interfaces.AngleSensor
+import frc.team1458.robot.ColorSensorConnect
 
 class RobotMap {
+
+    val colorSense = ColorSensorConnect()
+
     val leftMaster = SRX(canID = 2, encoderPPR = 18000.0, invert = true, invertEncoder = false)
     val rightMaster = SRX(canID = 3, encoderPPR = 18000.0, invert = false, invertEncoder = false)
 

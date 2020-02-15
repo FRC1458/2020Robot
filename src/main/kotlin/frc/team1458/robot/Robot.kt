@@ -15,6 +15,15 @@ import frc.team1458.lib.util.flow.delay
 import frc.team1458.lib.util.flow.systemTimeSeconds
 import frc.team1458.lib.util.maths.TurtleMaths
 
+import edu.wpi.first.wpilibj.I2C;
+
+import edu.wpi.first.wpilibj.util.Color;
+
+import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ColorMatchResult;
+import com.revrobotics.ColorMatch;
+
+
 class Robot : TimedRobot() {
 
     private val oi: OI = OI()
@@ -24,8 +33,8 @@ class Robot : TimedRobot() {
 
     override fun robotInit() {
         println("Robot Initialized")
-
         SmartDashboard.putNumber("intakevoltage", 0.8)
+
     }
 
     fun log() {
@@ -110,6 +119,25 @@ class Robot : TimedRobot() {
 
         //quantumIntake.setVoltage(SmartDashboard.getNumber("intakevoltage", 0.0) * oi.xboxController.getButton(Gamepad.Button.A).value.toDouble())
 
+
+
+        //Color
+        //TODO: Unbork
+
+        //Define current color and pretrained color values
+        val current_color = robot.colorSense.m_colorSensor.getColor()
+        val kRedTarget_pre =robot.colorSense.kRedTarget
+        val kYellowTarget_pre =robot.colorSense.kYellowTarget
+        val kGreenTarget_pre =robot.colorSense.kGreenTarget
+        val kBlueTarget_pre =robot.colorSense.kBlueTarget
+
+        val match = robot.colorSense.m_colorMatcher.matchClosestColor(current_color)
+        val color_detected = robot.colorSense.detect(match,kBlueTarget_pre,kRedTarget_pre,kGreenTarget_pre,kYellowTarget_pre)
+
+        println(color_detected)
+
+
+
         // TODO get out of this and put in log function
         SmartDashboard.putNumber("Speed", oi.throttle.value)
         SmartDashboard.putNumber("Steer", oi.steer.value)
@@ -121,6 +149,10 @@ class Robot : TimedRobot() {
         SmartDashboard.putNumber("Right Buffer", robot.drivetrain.rightMaster.inst.closedLoopTarget)
 
         enabledLog()
+
+
+
+
     }
 
     override fun testInit() {
