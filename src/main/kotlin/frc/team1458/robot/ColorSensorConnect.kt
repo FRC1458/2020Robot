@@ -33,36 +33,10 @@ class ColorSensorConnect {
     fun update() : String{
         val match = m_colorMatcher.matchClosestColor(m_colorSensor.getColor())
 
-        if (match.color === kBlueTarget) {
-            return("Blue")
-        } else if (match.color === kRedTarget) {
-            return("Red")
-        } else if (match.color === kGreenTarget) {
-            return("Green")
-        } else if (match.color === kYellowTarget) {
-            return("Yellow")
-        } else {
-            return("COLOR SENSOR BORK EVENT")
-        }
+        if (match.color === kBlueTarget) return("Blue")
+        if (match.color === kRedTarget) return("Red")
+        if (match.color === kGreenTarget) return("Green")
+        if (match.color === kYellowTarget) return("Yellow")
+        return("WHY ANISH SO DUMMY THICCC THO")
     }
 }
-
-/* Robot Periodic
-    val current_color = m_colorSensor.getColor()
-
-    val colorString: String
-    val match = m_colorMatcher.matchClosestColor(detectedColor)
-    if (match.color === kBlueTarget) {
-        colorString = "Blue"
-    } else if (match.color === kRedTarget) {
-        colorString = "Red"
-    } else if (match.color === kGreenTarget) {
-        colorString = "Green"
-    } else if (match.color === kYellowTarget) {
-        colorString = "Yellow"
-    } else {
-        colorString = "Unknown"
-    }
-
-}
-*/
