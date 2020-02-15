@@ -29,19 +29,20 @@ class ColorSensorConnect {
         m_colorMatcher.addColorMatch(kYellowTarget)
     }
 
-    fun detect(match:ColorMatchResult, blueTarget:Color, redTarget:Color, greenTarget:Color, yellowTarget:Color): String{
 
+    fun update() : String{
+        val match = m_colorMatcher.matchClosestColor(m_colorSensor.getColor())
 
-        if (match.color === blueTarget) {
+        if (match.color === kBlueTarget) {
             return("Blue")
-        } else if (match.color === redTarget) {
+        } else if (match.color === kRedTarget) {
             return("Red")
-        } else if (match.color === greenTarget) {
+        } else if (match.color === kGreenTarget) {
             return("Green")
-        } else if (match.color === yellowTarget) {
+        } else if (match.color === kYellowTarget) {
             return("Yellow")
         } else {
-            return("Unknown")
+            return("COLOR SENSOR BORK EVENT")
         }
     }
 }
