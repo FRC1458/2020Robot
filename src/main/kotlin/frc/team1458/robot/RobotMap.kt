@@ -6,7 +6,7 @@ import frc.team1458.lib.pathing.PathGenerator
 import frc.team1458.lib.pid.PIDConstants
 import frc.team1458.lib.sensor.NavX
 import frc.team1458.lib.sensor.interfaces.AngleSensor
-import frc.team1458.robot.ColorSensorConnect
+
 
 class RobotMap {
 
