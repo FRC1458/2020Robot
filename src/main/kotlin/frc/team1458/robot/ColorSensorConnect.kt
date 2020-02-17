@@ -6,9 +6,18 @@ import com.revrobotics.ColorSensorV3
 import com.revrobotics.ColorMatch
 
 
+
+/*
+
+Available functions:
+
+.update() -> Returns current color detected as a string
+
+ */
+
 class ColorSensorConnect {
 
-
+    //Establish Variables and color targets
     val i2cPort = I2C.Port.kOnboard
     val m_colorSensor = ColorSensorV3(i2cPort)
     val m_colorMatcher = ColorMatch()
@@ -17,6 +26,7 @@ class ColorSensorConnect {
     val kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114)
     val kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113)
 
+    //Init simply adds the color values to the matcher as part of the documentation
     init {
         m_colorMatcher.addColorMatch(kBlueTarget)
         m_colorMatcher.addColorMatch(kGreenTarget)
@@ -26,6 +36,7 @@ class ColorSensorConnect {
 
 
     fun update(): String {
+        //Match the color and compare it to our predetermined RGB values
         val match = m_colorMatcher.matchClosestColor(m_colorSensor.getColor())
 
         if (match.color === kBlueTarget) return("Blue")
