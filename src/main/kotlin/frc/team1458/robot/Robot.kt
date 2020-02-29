@@ -127,7 +127,8 @@ class Robot : TimedRobot() {
         //Imagine making a motor do things
         //This is mega stonksssss
 
-        robot.colorSense.rotateMotor("Blue", color, .1)
+        //TODO Make this a button plz. Tgis should only be run when necessary
+        //robot.colorSense.rotateMotor("Blue", color, .1)
 
 
 
