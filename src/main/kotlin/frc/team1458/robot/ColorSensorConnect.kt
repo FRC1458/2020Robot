@@ -4,7 +4,7 @@ package frc.team1458.robot
 import edu.wpi.first.wpilibj.I2C
 import com.revrobotics.ColorSensorV3
 import com.revrobotics.ColorMatch
-
+private val robot: RobotMap = RobotMap()
 
 
 /*
@@ -12,8 +12,11 @@ import com.revrobotics.ColorMatch
 Available functions:
 
 .update() -> Returns current color detected as a string
+.rotateMotor(colorDesired, currentColor, speed, override) -> Rotate the wheel until color desired is reached.
+ - Speed sets motor speed
+ - Override allows speed >1
 
- */
+*/
 
 class ColorSensorConnect {
 
@@ -43,6 +46,16 @@ class ColorSensorConnect {
         if (match.color === kRedTarget) return("Red")
         if (match.color === kGreenTarget) return("Green")
         if (match.color === kYellowTarget) return("Yellow")
+
+        //Error handling
         return("turtwig")
+    }
+
+    fun rotateMotor(colorDesired: String, currentColor: String, speed: Double, override: Boolean = false) {
+
+        while(colorDesired != currentColor && (speed < 1 || override)) {
+            robot.colorMotor.setRaw(speed)
+        }
+
     }
 }

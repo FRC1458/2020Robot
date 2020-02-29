@@ -15,6 +15,9 @@ class RobotMap {
     val leftMaster = SRX(canID = 2, encoderPPR = 18000.0, invert = true, invertEncoder = false)
     val rightMaster = SRX(canID = 3, encoderPPR = 18000.0, invert = false, invertEncoder = false)
 
+    //TODO: canID needed
+    val colorMotor  = SRX(canID = -1, invert = false)
+
     val drivetrain = Drivetrain(
             leftMaster = leftMaster, rightMaster = rightMaster,
             leftMotor  = SRX(canID = 4, master = leftMaster, invert = true),

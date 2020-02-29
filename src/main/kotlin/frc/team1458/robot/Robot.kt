@@ -115,11 +115,22 @@ class Robot : TimedRobot() {
 
 
         //Color sensing.
+
+
         //Gets the current color and also updates SmartDashboard with the string value
         val color = robot.colorSense.update()
+
         //TODO Remove the print. It is for testing only
         println(color)
         SmartDashboard.putString("Color Detected", color)
+
+        //Imagine making a motor do things
+        //This is mega stonks
+
+        robot.colorSense.rotateMotor("Blue", color, .1)
+
+
+
 
 
 
