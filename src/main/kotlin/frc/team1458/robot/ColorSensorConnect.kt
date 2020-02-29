@@ -53,8 +53,11 @@ class ColorSensorConnect {
 
     fun rotateMotor(colorDesired: String, currentColor: String, speed: Double, override: Boolean = false) {
 
-        while(colorDesired != currentColor && (speed < 1 || override)) {
+        var colorNow = currentColor
+
+        while(colorDesired != colorNow && (speed < 1 || override)) {
             robot.colorMotor.setRaw(speed)
+            colorNow = update()
         }
 
     }
