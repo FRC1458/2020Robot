@@ -125,7 +125,7 @@ class Robot : TimedRobot() {
         SmartDashboard.putString("Color Detected", color)
 
         //Imagine making a motor do things
-        //This is mega stonks
+        //This is mega stonksssss
 
         robot.colorSense.rotateMotor("Blue", color, .1)
 
