@@ -24,6 +24,13 @@ interface Gamepad {
     val rightT
         get() = getAxis(3)
 
+
+    val rightTrigger
+        get() = getAxis(3)
+    val leftTrigger
+        get() = getAxis(2)
+
+
     fun getButton(button: Button): Switch = getButton(button.number)
 
     fun getAxis(axis: Int): AnalogInput

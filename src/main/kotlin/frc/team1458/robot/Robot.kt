@@ -1,5 +1,7 @@
 package frc.team1458.robot
 
+
+
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.NeutralMode
@@ -58,7 +60,7 @@ class Robot : TimedRobot() {
                 arrayOf(
                         PathGenerator.Pose(0.0, 0.0, 0.0),
                         //PathGenerator.Pose(3.5, 2.5, -60.0),
-                        PathGenerator.Pose(2.0, 2.0, 0.0)
+                        PathGenerator.Pose(2.0, -25.0, -90.0)
                         // PathGenerator.Pose(6.0, 2.0, 40.0)
                 ),
                 startVelocity = 0.0, endVelocity = 0.0, reversed = false
@@ -69,20 +71,6 @@ class Robot : TimedRobot() {
     }
 
     override fun autonomousPeriodic() {
-
-        /*
-        val start = systemTimeSeconds
-        while((systemTimeSeconds - start) < 6.0) {
-            val v = 3.0 - Math.abs((systemTimeSeconds - start) - 3)
-            robot.drivetrain.driveVelocity(v, v)
-
-            enabledLog()
-            SmartDashboard.putNumber("Time", (systemTimeSeconds - start));
-            SmartDashboard.putNumber("Setpoint", v);
-        }
-        */
-
-        disabledInit()
     }
 
     override fun teleopInit() {
@@ -93,10 +81,46 @@ class Robot : TimedRobot() {
     override fun teleopPeriodic() {
         val (left, right) = TurtleMaths.arcadeDrive(TurtleMaths.deadband(oi.throttle.value, 0.05), TurtleMaths.deadband(oi.steer.value, 0.05))
 
+        val MAX_SPEED = 6.0
+        robot.drivetrain.driveVelocity(MAX_SPEED * left, MAX_SPEED * right)
+
+        if( oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
+
+            robot.drivetrain.driveVelocity(9.0 * left, 9.0 * right)
+        }
+
+        else if( oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered) {
+
+            robot.drivetrain.driveVelocity(0.0 * left, 0.0 * right)
+        }
+
+        else if( oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered && oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
+
+            robot.drivetrain.driveVelocity(11.0 * left, 8.0 * right)
+        }
+
+        else{
+        val rightTrig = oi.xboxController.rightTrigger.value
+        val leftTrig = oi.xboxController.leftTrigger.value
+
+        if((1-rightTrig)*MAX_SPEED !=MAX_SPEED){
+            robot.drivetrain.driveVelocity(MAX_SPEED * left, ((1-rightTrig)*MAX_SPEED) * right)
+        }
+
+        if((1-leftTrig)*MAX_SPEED !=MAX_SPEED){
+            robot.drivetrain.driveVelocity( ((1-leftTrig)*MAX_SPEED) * left, MAX_SPEED * right)
+        }
+
+            }
+
         //robot.drivetrain.driveVoltageScaled(left, right)
-        robot.drivetrain.driveVelocity(6.0 * left, 6.0 * right)
+        //robot.drivetrain.driveVelocity(9.0 * left, 9.0 * right)
         robot.drivetrain.updateOdom()
 
+        println(left)
+
+
+        /*
         when {
             oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered -> {
                 quantumIntake.speed = SmartDashboard.getNumber("intakevoltage", 0.0) // if (oi.xboxController.getButton(Gamepad.Button.A).triggered) { intakevoltage } else { -0.15 }
@@ -108,6 +132,7 @@ class Robot : TimedRobot() {
                 quantumIntake.speed = (0.0)
             }
         }
+        */
 
         //quantumIntake.setVoltage(SmartDashboard.getNumber("intakevoltage", 0.0) * oi.xboxController.getButton(Gamepad.Button.A).value.toDouble())
 
@@ -127,7 +152,7 @@ class Robot : TimedRobot() {
         //Imagine making a motor do things
         //This is mega stonksssss
 
-        //TODO Make this a button plz. Tgis should only be run when necessary
+        //TODO Make this a button plz. This should only be run when necessary
         //robot.colorSense.rotateMotor("Blue", color, .1)
 
 

@@ -48,7 +48,7 @@ class ColorSensorConnect {
         if (match.color === kYellowTarget) return("Yellow")
 
         //Error handling
-        return("turtwig")
+        return("turtwig: NO COLOR")
     }
 
     fun rotateMotor(colorDesired: String, currentColor: String, speed: Double, override: Boolean = false) {
