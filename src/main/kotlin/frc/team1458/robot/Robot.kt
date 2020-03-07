@@ -82,42 +82,51 @@ class Robot : TimedRobot() {
         val (left, right) = TurtleMaths.arcadeDrive(TurtleMaths.deadband(oi.throttle.value, 0.05), TurtleMaths.deadband(oi.steer.value, 0.05))
 
         val MAX_SPEED = 6.0
+
+
+        /*   Button Mappings:
+
+
+        Hold Right Bump: Increase speed to 9
+        Hold Left Bump: Parking Brake. Stops all robot motion
+
+        If right or left trigger buttons are held down, the can quick steer the robot in their direction
+        Steering power is determined by the ammount that the button is pressed down
+
+         */
+
+
+        //Default buttons and special stuff
         robot.drivetrain.driveVelocity(MAX_SPEED * left, MAX_SPEED * right)
 
-        if( oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
+        if (oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
 
             robot.drivetrain.driveVelocity(9.0 * left, 9.0 * right)
-        }
-
-        else if( oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered) {
+        } else if (oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered) {
 
             robot.drivetrain.driveVelocity(0.0 * left, 0.0 * right)
         }
 
-        else if( oi.xboxController.getButton(Gamepad.Button.LBUMP).triggered && oi.xboxController.getButton(Gamepad.Button.RBUMP).triggered) {
 
-            robot.drivetrain.driveVelocity(11.0 * left, 8.0 * right)
-        }
+        //Easy Turn
+        else {
 
-        else{
-        val rightTrig = oi.xboxController.rightTrigger.value
-        val leftTrig = oi.xboxController.leftTrigger.value
+            val rightTrig = oi.xboxController.rightTrigger.value
+            val leftTrig = oi.xboxController.leftTrigger.value
 
-        if((1-rightTrig)*MAX_SPEED !=MAX_SPEED){
-            robot.drivetrain.driveVelocity(MAX_SPEED * left, ((1-rightTrig)*MAX_SPEED) * right)
-        }
-
-        if((1-leftTrig)*MAX_SPEED !=MAX_SPEED){
-            robot.drivetrain.driveVelocity( ((1-leftTrig)*MAX_SPEED) * left, MAX_SPEED * right)
-        }
-
+            if ((1 - rightTrig) * MAX_SPEED != MAX_SPEED) {
+                robot.drivetrain.driveVelocity(MAX_SPEED * left, ((1 - rightTrig) * MAX_SPEED) * right)
             }
+
+            if ((1 - leftTrig) * MAX_SPEED != MAX_SPEED) {
+                robot.drivetrain.driveVelocity(((1 - leftTrig) * MAX_SPEED) * left, MAX_SPEED * right)
+            }
+
+        }
 
         //robot.drivetrain.driveVoltageScaled(left, right)
         //robot.drivetrain.driveVelocity(9.0 * left, 9.0 * right)
         robot.drivetrain.updateOdom()
-
-        println(left)
 
 
         /*
