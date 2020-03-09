@@ -4,6 +4,7 @@ package frc.team1458.robot
 import edu.wpi.first.wpilibj.I2C
 import com.revrobotics.ColorSensorV3
 import com.revrobotics.ColorMatch
+
 private val robot: RobotMap = RobotMap()
 
 
@@ -42,20 +43,20 @@ class ColorSensorConnect {
         //Match the color and compare it to our predetermined RGB values
         val match = m_colorMatcher.matchClosestColor(m_colorSensor.getColor())
 
-        if (match.color === kBlueTarget) return("Blue")
-        if (match.color === kRedTarget) return("Red")
-        if (match.color === kGreenTarget) return("Green")
-        if (match.color === kYellowTarget) return("Yellow")
+        if (match.color === kBlueTarget) return ("Blue")
+        if (match.color === kRedTarget) return ("Red")
+        if (match.color === kGreenTarget) return ("Green")
+        if (match.color === kYellowTarget) return ("Yellow")
 
         //Error handling
-        return("turtwig")
+        return ("turtwig: NO COLOR")
     }
 
     fun rotateMotor(colorDesired: String, currentColor: String, speed: Double, override: Boolean = false) {
 
         var colorNow: String = currentColor
 
-        while(colorDesired != colorNow && (speed < 1 || override)) {
+        while (colorDesired != colorNow && (speed < 1 || override)) {
             robot.colorMotor.setRaw(speed)
             colorNow = update()
         }

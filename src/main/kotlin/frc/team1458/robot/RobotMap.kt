@@ -12,16 +12,16 @@ class RobotMap {
 
     val colorSense = ColorSensorConnect()
 
-    val leftMaster = SRX(canID = 2, encoderPPR = 18000.0, invert = true, invertEncoder = false)
-    val rightMaster = SRX(canID = 3, encoderPPR = 18000.0, invert = false, invertEncoder = false)
+    val leftMaster = SRX(canID = 3, encoderPPR = 18000.0, invert = true, invertEncoder = false)
+    val rightMaster = SRX(canID = 2, encoderPPR = 18000.0, invert = false, invertEncoder = false)
 
     //TODO: canID needed
-    val colorMotor  = SRX(canID = -1, invert = false)
+    val colorMotor = SRX(canID = -1, invert = false)
 
     val drivetrain = Drivetrain(
             leftMaster = leftMaster, rightMaster = rightMaster,
-            leftMotor  = SRX(canID = 4, master = leftMaster, invert = true),
-            rightMotor = SRX(canID = 1, master = rightMaster, invert = false),
+            leftMotor = SRX(canID = 1, master = leftMaster, invert = true),
+            rightMotor = SRX(canID = 4, master = rightMaster, invert = false),
 
             closedLoop = true,
             wheelDiameter = 0.51,
@@ -30,10 +30,10 @@ class RobotMap {
             // kS is value from characterization tool with / 12.0 added
             // kF is calculated by this formula
             // (kV from char. tool) * ((852.5 * pi * wheel_diameter) / ppr)
-            pidConstantsLowGearLeft   = PIDConstants(kP = 0.10, kI = 0.0, kD = 0.0, kF = 0.07117573508, kS = 1.17 / 12.0),
-            pidConstantsLowGearRight  = PIDConstants(kP = 0.10, kI = 0.0, kD = 0.0, kF = 0.06980988942, kS = 1.19 / 12.0),
+            pidConstantsLowGearLeft = PIDConstants(kP = 0.10, kI = 0.0, kD = 0.0, kF = 0.07117573508, kS = 1.17 / 12.0),
+            pidConstantsLowGearRight = PIDConstants(kP = 0.10, kI = 0.0, kD = 0.0, kF = 0.06980988942, kS = 1.19 / 12.0),
 
-            pidConstantsHighGearLeft  = PIDConstants.DISABLE,
+            pidConstantsHighGearLeft = PIDConstants.DISABLE,
             pidConstantsHighGearRight = PIDConstants.DISABLE,
 
             shifter = null,
@@ -51,8 +51,8 @@ class RobotMap {
             trackWidth = 2.17,
             maxControlEffortVolts = 10.0,
             maxVelocity = 6.0,
-            maxAcceleration = 4.0,
-            maxCentripitalAcceleration = 2.0
+            maxAcceleration = 3.0,
+            maxCentripitalAcceleration = 0.5
     )
 
     /**

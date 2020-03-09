@@ -9,7 +9,7 @@ import frc.team1458.lib.input.interfaces.Switch
 class OI {
     val xboxController: Gamepad = Gamepad.xboxController(0)
 
-    var throttle = xboxController.leftY.scale(0.7).inverted
+    var throttle = xboxController.leftY.scale(1.0).inverted
     var steer = xboxController.rightX.scale(0.5)
 
 }
