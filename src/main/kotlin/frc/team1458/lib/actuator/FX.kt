@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import frc.team1458.lib.pid.PID
 import frc.team1458.lib.pid.PIDConstants
 import frc.team1458.lib.sensor.interfaces.AngleSensor
+import kotlin.math.withSign
 
 /* TODO Implement this new 2020 current limiting for FX and SRX (output and input limits):
  * Talon FX supports both stator(output) current limiting and supply(input) current limiting.
@@ -111,8 +112,7 @@ class FX(val canID: Int,
 
     // Takes degrees/sec
     fun setVelocity(vel: Double) {
-        println("yeeting talon ${SmartMotor.___degreesPerSecondToTalonVelocity(vel, encoderPPR)}, ${pidConstants.kS}, ${Math.copySign(vel, pidConstants.kS)}")
-        inst.set(ControlMode.Velocity, SmartMotor.___degreesPerSecondToTalonVelocity(vel, encoderPPR), DemandType.ArbitraryFeedForward, Math.copySign(pidConstants.kS, vel))
+        inst.set(ControlMode.Velocity, SmartMotor.___degreesPerSecondToTalonVelocity(vel, encoderPPR), DemandType.ArbitraryFeedForward, pidConstants.kS.withSign(vel))
     }
 
     companion object {

@@ -1,6 +1,9 @@
 package frc.team1458.lib.util.maths
 
+import frc.team1458.lib.util.flow.systemTimeMillis
 import kotlin.math.abs
+import kotlin.system.measureNanoTime
+import kotlin.system.measureTimeMillis
 
 class LookupTable2D(dataPoints: List<Pair<Double, Double>>) {
     private val dataPoints = dataPoints.sortedBy { it.first }
@@ -17,7 +20,7 @@ class LookupTable2D(dataPoints: List<Pair<Double, Double>>) {
             val pt1 = dataPoints[0]
             val pt2 = dataPoints[1]
 
-            return pt1.second + ((pt2.second - pt1.second) / (pt2.first - pt2.first)) * (x - pt1.first)
+            return pt1.second + ((pt2.second - pt1.second) / (pt2.first - pt1.first)) * (x - pt1.first)
         }
 
         val searchLocation = dataPoints.binarySearchBy(x) { it.first }
@@ -32,16 +35,16 @@ class LookupTable2D(dataPoints: List<Pair<Double, Double>>) {
             val pt1 = dataPoints[insertionPt - 2]
             val pt2 = dataPoints[insertionPt - 1]
 
-            return pt1.second + ((pt2.second - pt1.second) / (pt2.first - pt2.first)) * (x - pt1.first)
+            return pt1.second + ((pt2.second - pt1.second) / (pt2.first - pt1.first)) * (x - pt1.first)
         }
 
-        val pt1 = dataPoints[insertionPt]
-        val pt2 = dataPoints[insertionPt + 1]
+        val pt1 = dataPoints[insertionPt - 1]
+        val pt2 = dataPoints[insertionPt]
 
-        return pt1.second + ((pt2.second - pt1.second) / (pt2.first - pt2.first)) * (x - pt1.first)
+        return pt1.second + ((pt2.second - pt1.second) / (pt2.first - pt1.first)) * (x - pt1.first)
     }
-
 }
+
 
 fun lookupTableInterpolateTest() {
     val testArray: ArrayList<Pair<Double, Double>> = ArrayList<Pair<Double, Double>>()
@@ -52,15 +55,20 @@ fun lookupTableInterpolateTest() {
 
     val testTable = LookupTable2D(testArray)
 
+    // "Unit Testing"
     assert(testTable.interpolate(0.0) == 0.0)
     assert(testTable.interpolate(0.5) == 1.0)
     assert(testTable.interpolate(1.0) == 2.0)
     assert(testTable.interpolate(1.5) == 3.0)
-
     assert(testTable.interpolate(2.0) == 4.0)
     assert(testTable.interpolate(2.5) == 4.5)
     assert(testTable.interpolate(3.0) == 5.0)
     assert(testTable.interpolate(4.0) == 6.0)
+}
+
+
+fun main(args: Array<String>) {
+    lookupTableInterpolateTest()
 }
 
 
